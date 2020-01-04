@@ -2,16 +2,9 @@
   import Todo from './Todo.svelte'
 	let newTodo = '';
 	let showCompleted = true;
-	let todos = [{
-		name: 'Enregistrer ce tutoriel',
-		completed: false
-	},
-	{
-		name: "Preparer ce turoriel",
-		completed: true
-	}]
+	export let todos ;
 	
-	$: filteredTodos = todos.filter(t => t.completed === showCompleted ? true : t.completed)
+	$: filteredTodos = todos.filter(t => showCompleted === true ? true : t.completed === false)
 	
 	function addTodo(e){
 		e.preventDefault()
@@ -23,7 +16,8 @@
 		todos = [...todos, 
 			{
 				name: newTodo,
-				completed: false
+				completed: false,
+				id: Date.now()
 			}
 		];
 		newTodo = ''
@@ -39,13 +33,21 @@
 			 return t
 		 })
 	}
+
+	function deleteTodo(todo){
+	
+		todos = todos.filter(t => t !== todo)
+	
+	}
 </script>
 
 <h1>Ma todolist</h1>
 <label><input type="checkbox" bind:checked={showCompleted}> Afficher les taches complétées</label>
 <ul>
-	{#each filteredTodos as todo}
-		<Todo todo={todo} on:change={(e) => changeTodo(todo, e.detail)}/>		
+	{#each filteredTodos as todo (todo.id) }
+		<Todo todo={todo} 
+			on:delete={() => deleteTodo(todo)} 
+			on:change={(e) => changeTodo(todo, e.detail)}/>		
 	{/each}
 </ul>
 
